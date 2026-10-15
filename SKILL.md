@@ -5,6 +5,8 @@ description: "Open, inspect, and manage the herdr-overview grid: one cell per co
 
 # herdr-overview
 
+Repo: <https://github.com/jlapenna/herdr-overview> (tool: `bin/herdr-overview`, install with `install -m 0755 bin/herdr-overview ~/.local/bin/`)
+
 `herdr-overview` opens a Herdr tab containing one pane per detected coding agent, across the local Herdr session and every enabled saved machine (`herdr machine list`). The grid auto-follows agents as they start and exit.
 
 ## Check prerequisites first
