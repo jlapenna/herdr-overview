@@ -230,7 +230,7 @@ if [[ ${1:-} == --controller ]]; then
         wsjson=$(printf '%s\n' ${ids[@]+"${ids[@]}"} | jq -R 'select(. != "")' | jq -s .)
       fi
       jq -r --arg m "$m" --argjson ws "$wsjson" '.result.agents
-        | map(select($ws == null or ((.tab_id // "") | split(":")[0]) as $w | $ws | index($w)))
+        | map(select($ws == null or (((.tab_id // "") | split(":")[0]) as $w | $ws | index($w))))
         | sort_by(.pane_id)[]
         | [$m, .pane_id, (.name // "\(.agent) \(.cwd // "" | split("/") | last)")] | @tsv' "$cache/$m"
     done
