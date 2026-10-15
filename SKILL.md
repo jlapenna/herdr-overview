@@ -1,11 +1,11 @@
 ---
 name: herdr-overview
-description: "Open, inspect, and manage the herdr-overview grid: one cell per coding agent across the local Herdr session and every enabled saved machine. Use when the user asks for an overview/grid/live view of all agents, or mentions herdr-overview. Requires running inside a Herdr pane."
+description: "Open, inspect, and manage the herdr-overview grid: one cell per coding agent across the local Herdr session and every enabled saved machine, or a machine/workspace subset. Use when the user asks for an overview/grid/live view of all or some agents, or mentions herdr-overview. Requires running inside a Herdr pane."
 ---
 
 # herdr-overview
 
-Repo: <https://github.com/jlapenna/herdr-overview> (tool: `bin/herdr-overview`, install with `install -m 0755 bin/herdr-overview ~/.local/bin/`)
+Repo: <https://github.com/jlapenna/herdr-overview> — a [Herdr plugin](https://herdr.dev/docs/plugins/). Install it with `herdr plugin install jlapenna/herdr-overview` (actions + marketplace discoverable) or as a plain CLI with `install -m 0755 bin/herdr-overview ~/.local/bin/`.
 
 `herdr-overview` opens a Herdr tab containing one pane per detected coding agent, across the local Herdr session and every enabled saved machine (`herdr machine list`). The grid auto-follows agents as they start and exit.
 
@@ -23,6 +23,26 @@ If either fails, say what is missing (inside a Herdr pane / tool installed) and 
 herdr-overview              # read-only text copies, refreshed every 2s; click/Enter jumps to the agent
 herdr-overview --live       # each cell attaches to its agent and takes input
 herdr-overview --no-focus   # open without switching to the new tab
+```
+
+### Scoping to a subset
+
+Use `--machine` and/or `--workspace` (repeatable, comma lists, AND-combined) when the user wants only some agents:
+
+```bash
+herdr-overview --machine laforge                # one saved machine only
+herdr-overview --machine local,homelab          # "local" = the local session
+herdr-overview --workspace p                    # workspace id or label, case-insensitive
+herdr-overview --machine laforge --workspace p  # both filters at once
+```
+
+A workspace specifier is resolved per machine (each machine's own ids/labels). A specifier matching nothing contributes no cells — confirm the intended set from the controller log's `N agents:` line after opening.
+
+When installed as a plugin, the same grids exist as actions; prefer invoking the action for unscoped/"this workspace" requests:
+
+```bash
+herdr plugin action invoke herdr-overview.overview       # this workspace only
+herdr plugin action invoke herdr-overview.overview-all   # everything
 ```
 
 The command prints the new tab id and log path. Do not re-run it to "check" it worked — read the log instead:

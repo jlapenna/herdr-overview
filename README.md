@@ -11,11 +11,35 @@ A live grid of every [Herdr](https://github.com/herdrdev/herdr) agent in one tab
 
 ## Requirements
 
-- `herdr` in `PATH`, running inside a Herdr pane (`HERDR_ENV=1`)
+- `herdr` 0.9.0+ in `PATH`, running inside a Herdr pane (`HERDR_ENV=1`)
 - `jq`, `bash` 4+, `ssh` for remote machines
 - Saved machines configured via `herdr machine`
 
-## Install
+## Install as a Herdr plugin (recommended)
+
+```bash
+herdr plugin install jlapenna/herdr-overview
+```
+
+The manifest registers three actions, invocable from Herdr's action UI or bound to a key:
+
+| Action | What it opens |
+| --- | --- |
+| `herdr-overview.overview` | overview grid, scoped to the invoking workspace |
+| `herdr-overview.overview-all` | overview grid, every workspace and machine |
+| `herdr-overview.live` | live grid, scoped to the invoking workspace |
+
+Keybinding example (`config.toml`):
+
+```toml
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "herdr-overview.overview"
+description = "agent overview"
+```
+
+## Install as a plain CLI
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jlapenna/herdr-overview/main/bin/herdr-overview \
@@ -39,6 +63,19 @@ herdr-overview --live       # live view: cells attach and take input
 herdr-overview --no-focus   # either mode, without switching to the new tab
 ```
 
+### Subsets: `--machine` and `--workspace`
+
+```bash
+herdr-overview --machine laforge              # one machine's agents
+herdr-overview --machine local,homelab        # comma lists, repeatable
+herdr-overview --workspace p                  # agents in workspace id or label "p"
+herdr-overview --machine laforge --workspace p   # filters combine as AND
+```
+
+- `local` (or your `hostname -s`) always means the local session.
+- A workspace specifier matches each machine's workspace **id or label**, case-insensitively.
+- Unmatched machines/workspaces simply contribute no cells; the controller log shows the active filters.
+
 - **Close the tab to stop.** The controller notices and cleans up (live mode restores agent sizes).
 - **Detach from an attached cell:** `ctrl+b q` (attach's fixed detach key). If your outer Herdr prefix is also `ctrl+b`, press it twice to pass one through — the tool detects this and shows the right hint.
 - The root pane of the new tab tails the controller log; per-tab logs live under `${XDG_STATE_HOME:-~/.local/state}/herdr-overview/`.
@@ -60,7 +97,7 @@ herdr-overview --no-focus   # either mode, without switching to the new tab
 3. **`--cell`** — one overview cell: polls `herdr agent read --source visible`, repaints in place (no flicker), enables SGR mouse reporting so a left click focuses the agent.
 4. **`--view`** — one live cell: runs `herdr agent attach` (over `ssh -t` for remote machines), restores the agent's own pane size on detach, reattaches on Enter.
 
-`SKILL.md` in this repo teaches coding agents to run and reason about the tool.
+`SKILL.md` in this repo teaches coding agents to run and reason about the tool, and `herdr-plugin.toml` is the Herdr plugin manifest that registers the actions above (repo topic `herdr-plugin` lists it on the Herdr marketplace).
 
 ## License
 
